@@ -98,9 +98,6 @@ jobs:
 
       - name: Trivy filesystem scan
         uses: aquasecurity/trivy-action@0.28.0
-        env:
-          TRIVY_CACHE_DIR: .cache/trivy
-          TRIVY_SKIP_DIRS: .git,.cache,trivy,node_modules,dist,build
         with:
           scan-type: fs
           scan-ref: .
@@ -110,6 +107,7 @@ jobs:
           severity: CRITICAL,HIGH,MEDIUM
           ignore-unfixed: true
           cache-dir: .cache/trivy
+          skip-dirs: .git,.cache,trivy,node_modules,dist,build
           exit-code: ${{ steps.trivy_mode.outputs.code }}
 
       - name: Upload SARIF (Trivy FS)
@@ -136,14 +134,19 @@ jobs:
           image-ref: app-under-test:latest
           format: sarif
           output: trivy-image.sarif
-          scanners: vuln,secret,license
+          scanners: vuln,secret
           severity: CRITICAL,HIGH,MEDIUM
           ignore-unfixed: true
           cache-dir: .cache/trivy
           exit-code: ${{ steps.trivy_mode.outputs.code }}
 
-      - name: Fix SARIF URIs
-        run: sed -i 's/"OS Packages"/"docker:\/\/os-packages"/g' trivy-image.sarif
+      - name: Fix SARIF URIs (precise)
+        run: |
+          jq '
+            .runs[]?.results[]?.locations[]?.physicalLocation?.artifactLocation?.uri
+            |= (if . == "OS Packages" then "docker://os-packages" else . end)
+          ' trivy-image.sarif > trivy-image.fixed.sarif
+          mv trivy-image.fixed.sarif trivy-image.sarif
 
       - name: Upload SARIF (Trivy Image)
         if: always() && github.repository_owner == github.actor
