@@ -9,21 +9,6 @@ const jwt = require('jsonwebtoken');
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 
-// --- Dummy Hardcoded Secrets to Trigger Secret Detection ---
-const AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE";             // AWS access key ID pattern
-const AWS_SECRET_ACCESS_KEY = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
-const TWILIO_API_KEY = "5ABCDEF1234567890ABCDEF1234567890";
-const FACEBOOK_TOKEN = "FacebookXyzab1234567890abcdef123456";
-const JWT_SECRET = "hardcoded-super-secret-key-for-jwt";
-
-// Exporting secrets (unused but detectable):
-module.exports = {
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY,
-  TWILIO_API_KEY,
-  FACEBOOK_TOKEN,
-  JWT_SECRET
-};
 
 // --- Reflected XSS via Refused Output ---
 app.get('/', (req, res) => {
