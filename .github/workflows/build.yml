@@ -9,6 +9,10 @@ permissions:
   statuses: write
   security-events: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   semgrep:
     runs-on: ubuntu-latest
@@ -137,6 +141,9 @@ jobs:
           ignore-unfixed: true
           cache-dir: .cache/trivy
           exit-code: ${{ steps.trivy_mode.outputs.code }}
+
+      - name: Fix SARIF URIs
+        run: sed -i 's/"OS Packages"/"docker:\/\/os-packages"/g' trivy-image.sarif
 
       - name: Upload SARIF (Trivy Image)
         if: always() && github.repository_owner == github.actor
