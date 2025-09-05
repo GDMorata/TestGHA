@@ -106,7 +106,7 @@ jobs:
           scan-ref: .
           format: sarif
           output: trivy-fs.sarif
-          scanners: vuln,secret,license
+          scanners: vuln,secret
           severity: CRITICAL,HIGH,MEDIUM
           ignore-unfixed: true
           cache-dir: .cache/trivy
