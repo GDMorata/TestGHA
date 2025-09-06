@@ -39,6 +39,12 @@ jobs:
         if: ${{ matrix.language == 'java' && matrix['build-mode'] == 'autobuild' }}
         uses: github/codeql-action/autobuild@v3
 
+      - name: Manual build (Java)
+        if: ${{ matrix.language == 'java' && matrix['build-mode'] == 'manual' }}
+        run: |
+          ./mvnw -B -DskipTests package
+          # or: ./gradlew -x test build
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
