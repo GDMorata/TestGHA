@@ -20,8 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - language: javascript-typescript
-            build-mode: none
+          - language: javascript-typescript      
           - language: java
             build-mode: autobuild
 
@@ -33,14 +32,14 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          build-mode: ${{ matrix['build-mode'] }}
+          build-mode: ${{ matrix['build-mode'] || 'none' }}
 
       - name: Autobuild (Java)
-        if: ${{ matrix.language == 'java' && matrix['build-mode'] == 'autobuild' }}
+        if: ${{ matrix.language == 'java' && (matrix['build-mode'] || '') == 'autobuild' }}
         uses: github/codeql-action/autobuild@v3
 
       - name: Manual build (Java)
-        if: ${{ matrix.language == 'java' && matrix['build-mode'] == 'manual' }}
+        if: ${{ matrix.language == 'java' && (matrix['build-mode'] || '') == 'manual' }}
         run: |
           ./mvnw -B -DskipTests package
           # or: ./gradlew -x test build
